@@ -83,17 +83,17 @@ class Kararlar:
             icerik = driver.find_element(By.ID, "icerik").text
             # Sayfa iceriğinden hüküm özetini kazıma
             # hukumOzeti = self.__getHukumOzeti(icerik)
+            kararlarSozluk["url"] = self.__getUrl(icerik)
             # Sayfa içeriğinden atıfları kazıma
             atiflar = self.__getAtiflar(icerik)
-            # sayfa içeriğinden urlyi kazıma
-            kararlarSozluk["url"] = self.__getUrl(icerik)
-            # Karar bilgilerine tıkladıktan sonra gelen sayfa içeriğinde kolonlar bir sıra halinde geldiği için kolon isimlerini başlangıç ve bitiş indeksi olarak belirleyerek etinleri aldım. bunu yaptığım fonksiyonların tekrar eden kod satırlarını içerdiğini farkettiğimden dolayı bu fonksiyonları tek bir çatı altında topladım.
-            self.__addColumnsInformationToSozluk(icerik, kararlarSozluk)
-            # Son olarak hüküm özeti ve atıflar kısmını metin içeriğinde kolon isimleri ile bir bütün oluşturmadığı için ayrı ayrı bir fonksiyon olarak ekledim.
-            # kararlarSozluk["Hüküm Özeti"] = hukumOzeti
-            for atif in atiflar.split("\n")[1:]:
-                kararlarSozluk["Atıflar"] = atif
-                kararlarDetayList.append(kararlarSozluk)
+            for atif in atiflar.split("\n"):
+                newSozluk = {}
+                for key in kararlarSozluk.keys():
+                    newSozluk[key] = kararlarSozluk[key]
+                self.__addColumnsInformationToSozluk(icerik, newSozluk)
+                newSozluk["Atıflar"] = atif.strip()
+                kararlarDetayList.append(newSozluk)
+            
             # Driverımız şu an detay sayfasında bu sayfayı kapatıyoruz.
             driver.close()
             # driverımızı tekrar driver.window_handles aracılığıyla kararlar sayfasına geçiriyoruz.
